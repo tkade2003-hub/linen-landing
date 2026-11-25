@@ -313,14 +313,21 @@
   nav.foot a:hover{color:#fff}
 
   /* Reveal */
-  .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+  .reveal{opacity:0;transform:translateY(46px);transition:opacity .85s cubic-bezier(.2,.7,.2,1),transform .85s cubic-bezier(.2,.7,.2,1);will-change:opacity,transform}
   .reveal.in{opacity:1;transform:none}
-  .reveal-left{transform:translateX(-38px)}
-  .reveal-right{transform:translateX(38px)}
+  .reveal-left{transform:translateX(-58px)}
+  .reveal-right{transform:translateX(58px)}
   .reveal-zoom{transform:scale(.92) translateY(24px)}
   .reveal-tilt{transform:perspective(900px) rotateY(9deg) translateY(28px)}
   .reveal-tilt-r{transform:perspective(900px) rotateY(-9deg) translateY(28px)}
   .reveal-left.in,.reveal-right.in,.reveal-zoom.in,.reveal-tilt.in,.reveal-tilt-r.in{transform:none}
+  .checks li{opacity:0;transform:translateX(-16px);transition:opacity .6s ease,transform .6s ease}
+  .txt.in .checks li{opacity:1;transform:none}
+  .txt.in .checks li:nth-child(2){transition-delay:.12s}
+  .txt.in .checks li:nth-child(3){transition-delay:.24s}
+  .pill-note{opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s ease}
+  .txt.in .pill-note{opacity:1;transform:none}
+  .txt.in .pill-note:nth-child(2){transition-delay:.12s}
   /* Scroll progress + header state */
   #scrollProgress{
     position:fixed;top:0;left:0;right:0;height:3px;z-index:80;
@@ -507,7 +514,7 @@
         <h2>Customize every room and add-on.</h2>
         <p>Adjust bedrooms and bathrooms in a tap, pick tomorrow&rsquo;s 9:00 AM, 10:00 AM, or 2:00 PM arrival window, and add inside fridge or interior oven care whenever you need it.</p>
       </div>
-      <div class="config-card reveal reveal-zoom" id="configCard">
+      <div class="config-card reveal reveal-zoom" id="configCard" data-parallax="0.03">
         <div class="seg" role="tablist" aria-label="Service tier">
           <b data-tier="standard">Standard</b>
           <b data-tier="signature" class="on">Signature</b>
@@ -559,7 +566,7 @@
   <!-- Specialists -->
   <section id="specialists" style="padding-top:20px">
     <div class="wrap split">
-      <div class="phone book-phone reveal reveal-tilt" aria-hidden="true">
+      <div class="phone book-phone reveal reveal-tilt" data-parallax="-0.03" aria-hidden="true">
         <div class="phone-screen">
           <div class="statusbar"><span>11:15</span><span class="sicons">▂▄▆ ●●●</span></div>
           <div class="app-mark">linen</div>
@@ -603,7 +610,7 @@
           <li><span class="ck">✓</span> Cleaning pros can switch to Specialist Pro in app</li>
         </ul>
       </div>
-      <div class="dark-phones reveal reveal-tilt-r">
+      <div class="dark-phones reveal reveal-tilt-r" data-parallax="-0.045">
         <div class="phone" aria-hidden="true">
           <div class="phone-screen">
             <div class="statusbar"><span>11:15</span><span class="sicons">▂▄▆ ●●●</span></div>
@@ -734,24 +741,15 @@
     }
   })();
 
-  // Scroll reveal.
-  var io = new IntersectionObserver(function(entries){
-    entries.forEach(function(e){
-      if (e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); }
-    });
-  }, { threshold: 0.12 });
-  document.querySelectorAll(".reveal").forEach(function(el){ io.observe(el); });
-  // Failsafe: nothing stays hidden if the observer never fires.
-  setTimeout(function(){
-    document.querySelectorAll(".reveal").forEach(function(el){ el.classList.add("in"); });
-  }, 1600);
-
   // Scroll driven motion: progress bar, header shadow, hero map parallax.
   var progressEl = document.getElementById("scrollProgress");
   var headerEl = document.querySelector("header");
   var heroEl = document.querySelector(".hero");
   var heroMapEl = document.querySelector(".hero-map");
   var darkPhonesEl = document.querySelector(".dark-phones");
+  var heroWrapEl = document.querySelector(".hero .wrap");
+  var revealEls = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
+  var parallaxEls = Array.prototype.slice.call(document.querySelectorAll("[data-parallax]"));
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var ticking = false;
   function onScroll(){
@@ -759,24 +757,37 @@
     var max = document.documentElement.scrollHeight - window.innerHeight;
     progressEl.style.transform = "scaleX(" + (max > 0 ? y / max : 0) + ")";
     headerEl.classList.toggle("scrolled", y > 8);
+    // Reveal anything that has scrolled into the lower 88 percent of the screen.
+    revealEls.forEach(function(el){
+      if (!el.classList.contains("in") && el.getBoundingClientRect().top < window.innerHeight * 0.88){
+        el.classList.add("in");
+      }
+    });
     if (!reduced){
-      if (y < heroEl.offsetHeight + 80){
+      var hh = heroEl.offsetHeight;
+      if (y < hh + 80){
         heroMapEl.style.transform = "translateY(" + (y * 0.18) + "px)";
+        var f = Math.min(y / hh, 1);
+        heroWrapEl.style.opacity = String(1 - f * 0.75);
+        heroWrapEl.style.transform = "translateY(" + (y * -0.12) + "px)";
       }
-      if (darkPhonesEl){
-        var r = darkPhonesEl.getBoundingClientRect();
-        var off = (r.top + r.height / 2 - window.innerHeight / 2) * -0.045;
+      parallaxEls.forEach(function(el){
+        if (!el.classList.contains("in")) return;
+        var r = el.getBoundingClientRect();
+        var off = (r.top + r.height / 2 - window.innerHeight / 2) * parseFloat(el.getAttribute("data-parallax"));
         off = Math.max(-26, Math.min(26, off));
-        if (darkPhonesEl.classList.contains("in")){
-          darkPhonesEl.style.transform = "translateY(" + off + "px)";
-        }
-      }
+        el.style.transform = "translateY(" + off + "px)";
+      });
     }
     ticking = false;
   }
-  window.addEventListener("scroll", function(){
-    if (!ticking){ ticking = true; requestAnimationFrame(onScroll); }
-  }, { passive: true });
+  function queueScroll(){ if (!ticking){ ticking = true; requestAnimationFrame(onScroll); } }
+  window.addEventListener("scroll", queueScroll, { passive: true });
+  window.addEventListener("touchmove", queueScroll, { passive: true });
+  window.addEventListener("resize", queueScroll);
+  window.addEventListener("load", queueScroll);
+  setTimeout(queueScroll, 350);
+  setTimeout(queueScroll, 1000);
   onScroll();
 </script>
 </body>
