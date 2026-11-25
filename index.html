@@ -315,6 +315,20 @@
   /* Reveal */
   .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
   .reveal.in{opacity:1;transform:none}
+  .reveal-left{transform:translateX(-38px)}
+  .reveal-right{transform:translateX(38px)}
+  .reveal-zoom{transform:scale(.92) translateY(24px)}
+  .reveal-tilt{transform:perspective(900px) rotateY(9deg) translateY(28px)}
+  .reveal-tilt-r{transform:perspective(900px) rotateY(-9deg) translateY(28px)}
+  .reveal-left.in,.reveal-right.in,.reveal-zoom.in,.reveal-tilt.in,.reveal-tilt-r.in{transform:none}
+  /* Scroll progress + header state */
+  #scrollProgress{
+    position:fixed;top:0;left:0;right:0;height:3px;z-index:80;
+    background:linear-gradient(90deg,var(--mint),var(--mint-deep));
+    transform:scaleX(0);transform-origin:left;
+  }
+  header{transition:box-shadow .3s ease}
+  header.scrolled{box-shadow:0 8px 30px rgba(17,17,31,.08)}
   .proof .reveal{opacity:1 !important;transform:none !important;transition:none !important}
   .proof .hero h1,.proof .hero-copy,.proof .hero-phone{animation:none !important}
   @media (prefers-reduced-motion: reduce){
@@ -340,7 +354,7 @@
 </style>
 </head>
 <body>
-
+<div id="scrollProgress"></div>
 <header>
   <div class="wrap header-in">
     <a class="wordmark" href="#top">linen</a>
@@ -489,11 +503,11 @@
   <!-- Customize -->
   <section id="customize" style="padding-top:20px">
     <div class="wrap split">
-      <div class="txt reveal">
+      <div class="txt reveal reveal-left">
         <h2>Customize every room and add-on.</h2>
         <p>Adjust bedrooms and bathrooms in a tap, pick tomorrow&rsquo;s 9:00 AM, 10:00 AM, or 2:00 PM arrival window, and add inside fridge or interior oven care whenever you need it.</p>
       </div>
-      <div class="config-card reveal" id="configCard">
+      <div class="config-card reveal reveal-zoom" id="configCard">
         <div class="seg" role="tablist" aria-label="Service tier">
           <b data-tier="standard">Standard</b>
           <b data-tier="signature" class="on">Signature</b>
@@ -545,7 +559,7 @@
   <!-- Specialists -->
   <section id="specialists" style="padding-top:20px">
     <div class="wrap split">
-      <div class="phone book-phone reveal" aria-hidden="true">
+      <div class="phone book-phone reveal reveal-tilt" aria-hidden="true">
         <div class="phone-screen">
           <div class="statusbar"><span>11:15</span><span class="sicons">▂▄▆ ●●●</span></div>
           <div class="app-mark">linen</div>
@@ -566,7 +580,7 @@
           <div class="tabbar"><span>⌂</span><span class="on">⊕</span><span>▦</span><span>◉</span></div>
         </div>
       </div>
-      <div class="txt reveal">
+      <div class="txt reveal reveal-right">
         <h2>Vetted pros, live visit updates.</h2>
         <p>Save your home address and entry notes. Book in seconds, and the first available vetted specialist nearby accepts your clean with live status tracking.</p>
         <div class="pill-notes">
@@ -580,7 +594,7 @@
   <!-- Pay after visit -->
   <section class="dark">
     <div class="wrap split">
-      <div class="txt reveal">
+      <div class="txt reveal reveal-left">
         <h2>Pay only after your visit.</h2>
         <p>Track upcoming and past visits in one calm timeline. Settle effortlessly with Card or Apple Pay once your home is spotless.</p>
         <ul class="checks">
@@ -589,7 +603,7 @@
           <li><span class="ck">✓</span> Cleaning pros can switch to Specialist Pro in app</li>
         </ul>
       </div>
-      <div class="dark-phones reveal">
+      <div class="dark-phones reveal reveal-tilt-r">
         <div class="phone" aria-hidden="true">
           <div class="phone-screen">
             <div class="statusbar"><span>11:15</span><span class="sicons">▂▄▆ ●●●</span></div>
@@ -615,7 +629,7 @@
     <div class="wrap">
       <h2 class="reveal">Stop spending weekends cleaning.</h2>
       <p class="reveal">Vetted specialists, transparent flat rate tiers, and pay after visit peace of mind.</p>
-      <div class="qr-card reveal">
+      <div class="qr-card reveal reveal-zoom">
         <div class="qr-grid" id="qrGrid" aria-hidden="true"></div>
         <div class="qt">Get Linen for iOS</div>
         <div class="qs">Scan with your iPhone camera</div>
@@ -731,6 +745,39 @@
   setTimeout(function(){
     document.querySelectorAll(".reveal").forEach(function(el){ el.classList.add("in"); });
   }, 1600);
+
+  // Scroll driven motion: progress bar, header shadow, hero map parallax.
+  var progressEl = document.getElementById("scrollProgress");
+  var headerEl = document.querySelector("header");
+  var heroEl = document.querySelector(".hero");
+  var heroMapEl = document.querySelector(".hero-map");
+  var darkPhonesEl = document.querySelector(".dark-phones");
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var ticking = false;
+  function onScroll(){
+    var y = window.scrollY || 0;
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    progressEl.style.transform = "scaleX(" + (max > 0 ? y / max : 0) + ")";
+    headerEl.classList.toggle("scrolled", y > 8);
+    if (!reduced){
+      if (y < heroEl.offsetHeight + 80){
+        heroMapEl.style.transform = "translateY(" + (y * 0.18) + "px)";
+      }
+      if (darkPhonesEl){
+        var r = darkPhonesEl.getBoundingClientRect();
+        var off = (r.top + r.height / 2 - window.innerHeight / 2) * -0.045;
+        off = Math.max(-26, Math.min(26, off));
+        if (darkPhonesEl.classList.contains("in")){
+          darkPhonesEl.style.transform = "translateY(" + off + "px)";
+        }
+      }
+    }
+    ticking = false;
+  }
+  window.addEventListener("scroll", function(){
+    if (!ticking){ ticking = true; requestAnimationFrame(onScroll); }
+  }, { passive: true });
+  onScroll();
 </script>
 </body>
 </html>
