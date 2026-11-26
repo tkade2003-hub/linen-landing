@@ -451,14 +451,14 @@
             <div class="app-title">Freshness, on your schedule.</div>
             <div class="app-label">Choose a service</div>
             <div class="svc-row">
-              <div class="ic">⌂</div>
-              <div><div class="nm">Signature Clean<span class="badge">Most booked</span></div><div class="sb">2.5 hrs</div></div>
-              <div class="pr">$148</div>
+              <div class="ic">✦</div>
+              <div><div class="nm">Standard Cleaning<span class="badge">Most booked</span></div><div class="sb">Routine cleaning for a reasonably maintained home</div></div>
+              <div class="pr">From $99</div>
             </div>
             <div class="svc-row">
               <div class="ic">❧</div>
-              <div><div class="nm">Deep Seasonal Reset</div><div class="sb">4 hrs</div></div>
-              <div class="pr">$215</div>
+              <div><div class="nm">Deep Cleaning</div><div class="sb">Detailed cleaning for buildup and neglected areas</div></div>
+              <div class="pr">From $149</div>
             </div>
             <div class="app-label">Specialists near you</div>
             <div class="pro-row">
@@ -486,23 +486,23 @@
       <div class="price-stack">
         <div class="price-card reveal">
           <div class="ic">✦</div>
-          <div><div class="nm">Standard Tidy</div><div class="sb">2 hrs</div></div>
-          <div class="pr">$118</div>
+          <div><div class="nm">Standard Cleaning<span class="badge">Most booked</span></div><div class="sb">Routine cleaning for a reasonably maintained home</div></div>
+          <div class="pr">From $99</div>
         </div>
         <div class="price-card reveal" style="transition-delay:.08s">
           <div class="ic">⌂</div>
-          <div><div class="nm">Signature Clean<span class="badge">Most booked</span></div><div class="sb">2.5 hrs</div></div>
-          <div class="pr">$148</div>
+          <div><div class="nm">Deep Cleaning</div><div class="sb">Detailed cleaning for buildup and neglected areas</div></div>
+          <div class="pr">From $149</div>
         </div>
         <div class="price-card reveal" style="transition-delay:.16s">
           <div class="ic">❧</div>
-          <div><div class="nm">Deep Seasonal Reset</div><div class="sb">4 hrs</div></div>
-          <div class="pr">$215</div>
+          <div><div class="nm">Move-In / Move-Out</div><div class="sb">For empty or mostly empty homes</div></div>
+          <div class="pr">From $179</div>
         </div>
       </div>
       <div class="txt reveal">
         <h2>Choose your level of clean.</h2>
-        <p>From a quick 2 hour Standard Tidy to our Signature Clean with crisp linen bed making, mirrors, and baseboards, every tier shows your exact total upfront.</p>
+        <p>From Standard Cleaning for a reasonably maintained home to Deep Cleaning that tackles buildup and neglected areas, plus Move-In / Move-Out cleaning for empty or mostly empty homes, every booking shows your exact total upfront.</p>
       </div>
     </div>
   </section>
@@ -515,10 +515,16 @@
         <p>Adjust bedrooms and bathrooms in a tap, pick tomorrow&rsquo;s 9:00 AM, 10:00 AM, or 2:00 PM arrival window, and add inside fridge or interior oven care whenever you need it.</p>
       </div>
       <div class="config-card reveal reveal-zoom" id="configCard" data-parallax="0.03">
-        <div class="seg" role="tablist" aria-label="Service tier">
-          <b data-tier="standard">Standard</b>
-          <b data-tier="signature" class="on">Signature</b>
-          <b data-tier="deep">Deep Reset</b>
+        <div class="seg" id="tierSeg" role="tablist" aria-label="Cleaning type">
+          <b data-tier="standard" class="on">Standard</b>
+          <b data-tier="deep">Deep</b>
+          <b data-tier="move">Move-In / Move-Out</b>
+        </div>
+        <div class="seg" id="freqSeg" role="tablist" aria-label="Booking frequency">
+          <b data-freq="once" class="on">One-time</b>
+          <b data-freq="weekly">Weekly</b>
+          <b data-freq="biweekly">Every 2 weeks</b>
+          <b data-freq="monthly">Every 4 weeks</b>
         </div>
         <div class="cfg-row">
           <span>⌂&nbsp; Bedrooms</span>
@@ -528,7 +534,7 @@
             <button class="stepbtn" id="bedPlus" aria-label="More bedrooms">+</button>
           </span>
         </div>
-        <div class="cfg-row">
+        <div class="cfg-row" id="bathRow">
           <span>🛁&nbsp; Bathrooms</span>
           <span class="val">
             <button class="stepbtn" id="bathMinus" aria-label="Fewer bathrooms">−</button>
@@ -548,13 +554,13 @@
         </div>
         <div class="toggle-row">
           <span>▤&nbsp; Interior oven</span>
-          <span class="amt">+$30</span>
+          <span class="amt">+$25</span>
           <button class="switch" id="ovenSwitch" aria-label="Toggle interior oven add on"></button>
         </div>
         <div class="cfg-total">
           <div>
             <div class="tt">Total</div>
-            <div class="tv" id="cfgTotal">$173</div>
+            <div class="tv" id="cfgTotal">$194</div>
             <div class="pay">Pay after visit</div>
           </div>
           <div class="cta">Confirm booking</div>
@@ -571,7 +577,7 @@
           <div class="statusbar"><span>11:15</span><span class="sicons">▂▄▆ ●●●</span></div>
           <div class="app-mark">linen</div>
           <div class="app-title">Book a cleaning.</div>
-          <div class="seg"><b>Standard</b><b class="on">Signature</b><b>Deep Reset</b></div>
+          <div class="seg"><b class="on">Standard</b><b>Deep</b><b>Move-In / Move-Out</b></div>
           <div class="svc-row" style="margin-bottom:4px">
             <div class="ic">＋</div>
             <div><div class="nm">Add your home</div><div class="sb">Address, bedrooms and entry notes</div></div>
@@ -581,7 +587,7 @@
           <div class="mini-row"><span>🛁&nbsp; Bathrooms</span><span class="val"><span class="stepbtn">−</span>2<span class="stepbtn">+</span></span></div>
           <div class="mini-row"><span>▦&nbsp; Inside fridge</span><span class="val" style="font-size:12.5px;color:var(--charcoal);opacity:.65">+$25</span><span class="switch on" style="width:42px;height:25px;pointer-events:none"></span></div>
           <div class="totalbar">
-            <div><div class="tt">Total</div><div class="tv">$173</div><div class="pay">Pay after visit</div></div>
+            <div><div class="tt">Total</div><div class="tv">$194</div><div class="pay">Pay after visit</div></div>
             <div class="cta">Confirm booking</div>
           </div>
           <div class="tabbar"><span>⌂</span><span class="on">⊕</span><span>▦</span><span>◉</span></div>
@@ -664,40 +670,66 @@
 
 <script>
   if (new URLSearchParams(location.search).has("proof")) { document.documentElement.classList.add("proof"); }
-  // Configurator: same pricing formula as the app.
-  var PRICES = { standard: 118, signature: 148, deep: 215 };
-  var state = { tier: "signature", beds: 2, baths: 2, fridge: true, oven: false };
+  // Configurator: pricing blueprint set 2026-11-26. Base price comes from the
+  // blueprint matrices; the frequency discount applies to the base only,
+  // then add-ons are added on top.
+  var BED_LABELS = ["Studio", "1", "2", "3", "4", "5", "6+"];
+  var BATH_VALUES = [1, 1.5, 2, 2.5, 3, 3.5, 4.5];
+  var BATH_LABELS = ["1", "1.5", "2", "2.5", "3", "3.5", "4+"];
+  var STD_PRICES = [{1:99}, {1:119, 2:139}, {1:149, 2:169}, {1:189, 2:199, 3:229}, {2:239, 3:269, 4:299}, {3:299, 4:329}, 349];
+  var DEEP_PRICES = [{1:149}, {1:179, 2:199}, {1:219, 2:249}, {1:279, 2:299, 3:339}, {2:359, 3:399, 4:449}, {3:449, 4:489}, 529];
+  var MOVE_PRICES = [179, 219, 279, 349, 429, 499, 579];
+  var FREQ_DISCOUNT = { once: 0, weekly: 0.15, biweekly: 0.10, monthly: 0.05 };
+  var state = { tier: "standard", bedIdx: 2, bathIdx: 2, freq: "once", fridge: true, oven: false };
   var totalEl = document.getElementById("cfgTotal");
-  function money(n){ return "$" + n; }
+  function money(n){
+    n = Math.round(n * 100) / 100;
+    return n % 1 === 0 ? "$" + n : "$" + n.toFixed(2);
+  }
+  function basePrice(){
+    if (state.tier === "move") return MOVE_PRICES[state.bedIdx];
+    var row = (state.tier === "deep" ? DEEP_PRICES : STD_PRICES)[state.bedIdx];
+    if (typeof row === "number") return row;
+    var b = Math.ceil(BATH_VALUES[state.bathIdx]);
+    if (row[b] != null) return row[b];
+    var top = 0;
+    for (var k in row) { if (row[k] > top) top = row[k]; }
+    return top;
+  }
   function recalc(){
-    var t = PRICES[state.tier] + (state.beds - 2) * 22 + (state.baths - 2) * 28;
+    var t = basePrice() * (1 - FREQ_DISCOUNT[state.freq]);
     if (state.fridge) t += 25;
-    if (state.oven) t += 30;
-    t = Math.max(t, 50);
+    if (state.oven) t += 25;
     totalEl.textContent = money(t);
     totalEl.classList.remove("pop");
     void totalEl.offsetWidth;
     totalEl.classList.add("pop");
-    document.getElementById("bedVal").textContent = state.beds;
-    document.getElementById("bathVal").textContent = state.baths;
-    document.getElementById("bedMinus").disabled = state.beds <= 0;
-    document.getElementById("bedPlus").disabled = state.beds >= 8;
-    document.getElementById("bathMinus").disabled = state.baths <= 1;
-    document.getElementById("bathPlus").disabled = state.baths >= 8;
+    document.getElementById("bedVal").textContent = BED_LABELS[state.bedIdx];
+    document.getElementById("bathVal").textContent = BATH_LABELS[state.bathIdx];
+    document.getElementById("bedMinus").disabled = state.bedIdx <= 0;
+    document.getElementById("bedPlus").disabled = state.bedIdx >= BED_LABELS.length - 1;
+    var isMove = state.tier === "move";
+    document.getElementById("bathMinus").disabled = isMove || state.bathIdx <= 0;
+    document.getElementById("bathPlus").disabled = isMove || state.bathIdx >= BATH_VALUES.length - 1;
+    document.getElementById("bathRow").style.opacity = isMove ? "0.45" : "";
   }
-  document.querySelectorAll("#configCard .seg b").forEach(function(el){
-    el.addEventListener("click", function(){
-      document.querySelectorAll("#configCard .seg b").forEach(function(x){ x.classList.remove("on"); });
-      el.classList.add("on");
-      state.tier = el.getAttribute("data-tier");
-      recalc();
+  function wireSeg(id, key, attr){
+    document.querySelectorAll("#" + id + " b").forEach(function(el){
+      el.addEventListener("click", function(){
+        document.querySelectorAll("#" + id + " b").forEach(function(x){ x.classList.remove("on"); });
+        el.classList.add("on");
+        state[key] = el.getAttribute(attr);
+        recalc();
+      });
     });
-  });
+  }
+  wireSeg("tierSeg", "tier", "data-tier");
+  wireSeg("freqSeg", "freq", "data-freq");
   function step(id, fn){ document.getElementById(id).addEventListener("click", function(){ fn(); recalc(); }); }
-  step("bedMinus", function(){ state.beds = Math.max(0, state.beds - 1); });
-  step("bedPlus", function(){ state.beds = Math.min(8, state.beds + 1); });
-  step("bathMinus", function(){ state.baths = Math.max(1, state.baths - 1); });
-  step("bathPlus", function(){ state.baths = Math.min(8, state.baths + 1); });
+  step("bedMinus", function(){ state.bedIdx = Math.max(0, state.bedIdx - 1); });
+  step("bedPlus", function(){ state.bedIdx = Math.min(BED_LABELS.length - 1, state.bedIdx + 1); });
+  step("bathMinus", function(){ state.bathIdx = Math.max(0, state.bathIdx - 1); });
+  step("bathPlus", function(){ state.bathIdx = Math.min(BATH_VALUES.length - 1, state.bathIdx + 1); });
   document.querySelectorAll("#slotChips .chip").forEach(function(chip){
     chip.addEventListener("click", function(){
       document.querySelectorAll("#slotChips .chip").forEach(function(x){ x.classList.remove("on"); });
