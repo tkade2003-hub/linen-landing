@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Linen payout setup</title>
+<style>
+  :root { --mint:#3EB489; --ink:#11111F; --charcoal:#333447; --card:#F3F3F5; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color:var(--ink); background:#fff; }
+  main { max-width: 560px; margin: 0 auto; padding: 28px 20px 48px; }
+  .wordmark { font-size: 34px; font-weight: 900; color: var(--mint); letter-spacing: -1px; }
+  h1 { font-size: 28px; font-weight: 800; margin: 22px 0 8px; }
+  p.sub { font-size: 16px; line-height: 1.45; color: rgba(51,52,71,.78); margin: 0 0 20px; }
+  #status { font-size: 15px; font-weight: 600; color: var(--charcoal); background: var(--card); border-radius: 14px; padding: 14px 16px; margin-bottom: 18px; }
+  #status.error { color: #B3261E; }
+  #component { min-height: 300px; }
+  .return { display:block; text-align:center; margin-top: 26px; background: var(--mint); color:#fff; font-weight:700; font-size:17px; padding: 16px; border-radius: 999px; text-decoration:none; }
+  .note { font-size: 13px; color: rgba(51,52,71,.6); text-align:center; margin-top: 12px; line-height: 1.4; }
+  button.retry { background: var(--ink); color:#fff; border:0; font-weight:700; font-size:15px; padding: 12px 22px; border-radius: 999px; margin-top: 10px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="wordmark">linen</div>
+  <h1>Payout setup</h1>
+  <p class="sub">Stripe collects your identity, tax details, and bank details here. When Stripe clears you, your Linen workspace opens and your pay and tips can land in your bank.</p>
+  <div id="status">Loading your Stripe setup…</div>
+  <div id="component"></div>
+  <a class="return" href="linen://payouts/return">Done, return to Linen</a>
+  <p class="note">If the button does not switch you back, just reopen the Linen app. It checks Stripe for you.</p>
+</main>
+<script src="https://connect-js.stripe.com/v1.0/connect.js"></script>
+<script>
+(function () {
+  var PUBLISHABLE_KEY = "pk_live_51SF3mXEKeSJxDIOAkK0b2xxzECkbE6RfjMAdtxYx6wwHCvTmDZSxgPaHnB5UusjmF5YptYPdK5pJCGI1M4tqug1h00PC9zzBYW";
+  var ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmdGx3bG5iZnFxcXhmZHNjYXRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1NzYyNDgsImV4cCI6MjExMTE1MjI0OH0.YfNnJEAE1QO9MG3ZKpJ5QY47_XiqWqXrWCUdgjnh4Ro";
+  var SESSION_URL = "https://vftlwlnbfqqqxfdscato.supabase.co/functions/v1/connect-account-session";
+  var statusEl = document.getElementById("status");
+
+  function fail(msg) {
+    statusEl.textContent = msg;
+    statusEl.className = "error";
+    var b = document.createElement("button");
+    b.className = "retry";
+    b.textContent = "Try again";
+    b.onclick = function () { location.reload(); };
+    statusEl.appendChild(document.createElement("br"));
+    statusEl.appendChild(b);
+  }
+
+  var hash = new URLSearchParams(location.hash.replace(/^#/, ""));
+  var token = hash.get("t");
+  history.replaceState(null, "", location.pathname);
+  if (!token) {
+    fail("Open this page from the Linen app so it can sign you in.");
+    return;
+  }
+
+  async function fetchClientSecret() {
+    var res = await fetch(SESSION_URL, {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + token,
+        "apikey": ANON_KEY,
+        "Content-Type": "application/json"
+      },
+      body: "{}"
+    });
+    if (!res.ok) throw new Error("session failed " + res.status);
+    var data = await res.json();
+    return data.client_secret;
+  }
+
+  try {
+    var instance = window.StripeConnect.loadConnectAndInitialize({
+      publishableKey: PUBLISHABLE_KEY,
+      fetchClientSecret: fetchClientSecret,
+      appearance: {
+        overlays: "dialog",
+        variables: { colorPrimary: "#3EB489" }
+      }
+    });
+    var component = instance.create("account_onboarding");
+    if (typeof component.setOnExit === "function") {
+      component.setOnExit(function () {
+        statusEl.textContent = "Setup closed. If you finished everything Stripe asked for, return to Linen and your workspace will open.";
+      });
+    }
+    document.getElementById("component").appendChild(component);
+    statusEl.textContent = "Complete the Stripe steps below.";
+  } catch (e) {
+    fail("Stripe setup could not load. Check your connection and try again.");
+  }
+})();
+</script>
+</body>
+</html>
