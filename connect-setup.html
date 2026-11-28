@@ -64,7 +64,11 @@
   var hash = new URLSearchParams(location.hash.replace(/^#/, ""));
   var token = hash.get("t");
   history.replaceState(null, "", location.pathname);
-  var pageToken = sessionStorage.getItem("linen_page_token") || null;
+  var pageToken = null;
+  try { pageToken = localStorage.getItem("linen_page_token") || null; } catch (e) {}
+  if (!pageToken) {
+    try { pageToken = sessionStorage.getItem("linen_page_token") || null; } catch (e) {}
+  }
   if (!code && !token && !pageToken) {
     fail("Open this page from the Linen app so it can sign you in.");
     return;
@@ -86,14 +90,24 @@
         var byCode = await postJson(EXCHANGE_URL, { "apikey": ANON_KEY, "Content-Type": "application/json" }, { code: code });
         if (byCode.page_token) {
           pageToken = byCode.page_token;
-          sessionStorage.setItem("linen_page_token", pageToken);
+          try { localStorage.setItem("linen_page_token", pageToken); } catch (e) {}
+          try { sessionStorage.setItem("linen_page_token", pageToken); } catch (e) {}
+          try {
+            var clean = new URL(window.location.href);
+            clean.searchParams.delete("c");
+            history.replaceState(null, "", clean.toString());
+          } catch (e) {}
         }
         return byCode.client_secret;
       }
       var direct = await postJson(SESSION_URL, { "Authorization": "Bearer " + token, "apikey": ANON_KEY, "Content-Type": "application/json" }, {});
       return direct.client_secret;
     } catch (e) {
-      statusEl.textContent = "Session error: " + (e && e.message ? e.message : e);
+      if (e && e.message && e.message.indexOf("401") !== -1) {
+        statusEl.textContent = "This setup link has expired. Go back to the Linen app and tap Continue Stripe setup, and a fresh one opens.";
+      } else {
+        statusEl.textContent = "Session error: " + (e && e.message ? e.message : e);
+      }
       statusEl.className = "error";
       throw e;
     }
