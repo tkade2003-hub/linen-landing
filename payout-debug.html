@@ -124,7 +124,11 @@
         variables: { colorPrimary: "#3EB489" }
       }
     });
-    var component = instance.create("account_onboarding");
+    var component = instance.create("account-onboarding");
+    if (!component) {
+      fail("Stripe could not create the onboarding form. Try again.");
+      return;
+    }
     if (typeof component.setOnExit === "function") {
       component.setOnExit(function () {
         statusEl.textContent = "Setup closed. If you finished everything Stripe asked for, return to Linen and your workspace will open.";
