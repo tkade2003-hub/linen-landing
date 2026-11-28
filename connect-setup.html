@@ -33,6 +33,12 @@
   <a class="return" href="linen://payouts/return">Done, return to Linen</a>
   <p class="note">If the button does not switch you back, just reopen the Linen app. It checks Stripe for you.</p>
 </main>
+<script>
+  window.__linenConnectReady = new Promise(function (resolve) {
+    window.StripeConnect = window.StripeConnect || {};
+    window.StripeConnect.onLoad = function () { resolve(window.StripeConnect); };
+  });
+</script>
 <script src="https://connect-js.stripe.com/v1.0/connect.js"></script>
 <script>
 (async function () {
@@ -93,27 +99,17 @@
     }
   }
 
-  async function waitForStripeConnect(timeoutMs) {
-    var start = Date.now();
-    while (Date.now() - start < timeoutMs) {
-      var sc = window.StripeConnect;
-      if (sc && typeof sc.then === "function") {
-        try { sc = await sc; } catch (e) { /* keep waiting */ }
-      }
-      if (sc && typeof sc.loadConnectAndInitialize === "function") return sc;
-      await new Promise(function (r) { setTimeout(r, 250); });
-    }
-    return null;
-  }
-
-  var StripeConnectLib = await waitForStripeConnect(20000);
-  if (!StripeConnectLib) {
+  var StripeConnectLib = await Promise.race([
+    window.__linenConnectReady,
+    new Promise(function (resolve) { setTimeout(function () { resolve(null); }, 20000); })
+  ]);
+  if (!StripeConnectLib || typeof StripeConnectLib.init !== "function") {
     fail("The Stripe library did not load. Check your connection and try again.");
     return;
   }
 
   try {
-    var instance = StripeConnectLib.loadConnectAndInitialize({
+    var instance = StripeConnectLib.init({
       publishableKey: PUBLISHABLE_KEY,
       fetchClientSecret: fetchClientSecret,
       appearance: {
