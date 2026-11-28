@@ -35,7 +35,7 @@
 </main>
 <script src="https://connect-js.stripe.com/v1.0/connect.js"></script>
 <script>
-(function () {
+(async function () {
   var PUBLISHABLE_KEY = "pk_live_51SF3mXEKeSJxDIOAkK0b2xxzECkbE6RfjMAdtxYx6wwHCvTmDZSxgPaHnB5UusjmF5YptYPdK5pJCGI1M4tqug1h00PC9zzBYW";
   var ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmdGx3bG5iZnFxcXhmZHNjYXRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1NzYyNDgsImV4cCI6MjExMTE1MjI0OH0.YfNnJEAE1QO9MG3ZKpJ5QY47_XiqWqXrWCUdgjnh4Ro";
   var EXCHANGE_URL = "https://vftlwlnbfqqqxfdscato.supabase.co/functions/v1/connect-session-exchange";
@@ -93,13 +93,27 @@
     }
   }
 
-  if (!window.StripeConnect || typeof window.StripeConnect.loadConnectAndInitialize !== "function") {
+  async function waitForStripeConnect(timeoutMs) {
+    var start = Date.now();
+    while (Date.now() - start < timeoutMs) {
+      var sc = window.StripeConnect;
+      if (sc && typeof sc.then === "function") {
+        try { sc = await sc; } catch (e) { /* keep waiting */ }
+      }
+      if (sc && typeof sc.loadConnectAndInitialize === "function") return sc;
+      await new Promise(function (r) { setTimeout(r, 250); });
+    }
+    return null;
+  }
+
+  var StripeConnectLib = await waitForStripeConnect(20000);
+  if (!StripeConnectLib) {
     fail("The Stripe library did not load. Check your connection and try again.");
     return;
   }
 
   try {
-    var instance = window.StripeConnect.loadConnectAndInitialize({
+    var instance = StripeConnectLib.loadConnectAndInitialize({
       publishableKey: PUBLISHABLE_KEY,
       fetchClientSecret: fetchClientSecret,
       appearance: {
