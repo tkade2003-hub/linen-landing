@@ -36,6 +36,7 @@
 (function () {
   var PUBLISHABLE_KEY = "pk_live_51SF3mXEKeSJxDIOAkK0b2xxzECkbE6RfjMAdtxYx6wwHCvTmDZSxgPaHnB5UusjmF5YptYPdK5pJCGI1M4tqug1h00PC9zzBYW";
   var ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmdGx3bG5iZnFxcXhmZHNjYXRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1NzYyNDgsImV4cCI6MjExMTE1MjI0OH0.YfNnJEAE1QO9MG3ZKpJ5QY47_XiqWqXrWCUdgjnh4Ro";
+  var EXCHANGE_URL = "https://vftlwlnbfqqqxfdscato.supabase.co/functions/v1/connect-session-exchange";
   var SESSION_URL = "https://vftlwlnbfqqqxfdscato.supabase.co/functions/v1/connect-account-session";
   var statusEl = document.getElementById("status");
 
@@ -50,27 +51,38 @@
     statusEl.appendChild(b);
   }
 
+  var query = new URLSearchParams(location.search);
+  var code = query.get("c");
   var hash = new URLSearchParams(location.hash.replace(/^#/, ""));
   var token = hash.get("t");
   history.replaceState(null, "", location.pathname);
-  if (!token) {
+  var pageToken = sessionStorage.getItem("linen_page_token") || null;
+  if (!code && !token && !pageToken) {
     fail("Open this page from the Linen app so it can sign you in.");
     return;
   }
 
-  async function fetchClientSecret() {
-    var res = await fetch(SESSION_URL, {
-      method: "POST",
-      headers: {
-        "Authorization": "Bearer " + token,
-        "apikey": ANON_KEY,
-        "Content-Type": "application/json"
-      },
-      body: "{}"
-    });
+  async function postJson(url, headers, body) {
+    var res = await fetch(url, { method: "POST", headers: headers, body: JSON.stringify(body) });
     if (!res.ok) throw new Error("session failed " + res.status);
-    var data = await res.json();
-    return data.client_secret;
+    return res.json();
+  }
+
+  async function fetchClientSecret() {
+    if (pageToken) {
+      var byToken = await postJson(EXCHANGE_URL, { "apikey": ANON_KEY, "Content-Type": "application/json" }, { page_token: pageToken });
+      return byToken.client_secret;
+    }
+    if (code) {
+      var byCode = await postJson(EXCHANGE_URL, { "apikey": ANON_KEY, "Content-Type": "application/json" }, { code: code });
+      if (byCode.page_token) {
+        pageToken = byCode.page_token;
+        sessionStorage.setItem("linen_page_token", pageToken);
+      }
+      return byCode.client_secret;
+    }
+    var direct = await postJson(SESSION_URL, { "Authorization": "Bearer " + token, "apikey": ANON_KEY, "Content-Type": "application/json" }, {});
+    return direct.client_secret;
   }
 
   try {
