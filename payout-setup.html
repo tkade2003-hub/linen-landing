@@ -69,6 +69,8 @@
   if (!pageToken) {
     try { pageToken = sessionStorage.getItem("linen_page_token") || null; } catch (e) {}
   }
+  var urlPageToken = query.get("p");
+  if (urlPageToken) pageToken = urlPageToken;
   if (!code && !token && !pageToken) {
     fail("Open this page from the Linen app so it can sign you in.");
     return;
@@ -95,6 +97,7 @@
           try {
             var clean = new URL(window.location.href);
             clean.searchParams.delete("c");
+            clean.searchParams.set("p", pageToken);
             history.replaceState(null, "", clean.toString());
           } catch (e) {}
         }
